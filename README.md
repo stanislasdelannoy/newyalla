@@ -44,7 +44,7 @@ La deuxième étape consiste à créer les schémas Pydantic pour chaque modèle
 
 ------------------------------------
 
-# Troisième étape : Connexion et initialisation de la base de données
+## Troisième étape : Connexion et initialisation de la base de données
 
 La troisième étape consiste à connecter ton application à la base PostgreSQL et à initialiser la structure des tables à partir de tes modèles SQLAlchemy.
 
