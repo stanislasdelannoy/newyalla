@@ -1,6 +1,6 @@
 # Yalla
 
-## Première étape : BDD
+## Première étape : Modèles de BDD
 
 La première étape consiste à récréer les schemas de base de données.
 
@@ -14,6 +14,31 @@ En les créant d’abord, tu assures la cohérence et la fiabilité de ton site 
 
 - **SQLAlchemy :** SQLAlchemy est une bibliothèque Python qui sert d’ORM (Object Relational Mapper). Elle permet de manipuler la base de données avec du code Python, sans écrire de SQL directement. Tu crées des classes Python (modèles) qui représentent tes tables, et SQLAlchemy se charge de traduire tes actions en requêtes SQL.
 
+## Deuxième étape : Schémas Pydantic
+
+La deuxième étape consiste à créer les schémas Pydantic pour chaque modèle.
+
+> **Les schémas Pydantic :**
+> Ces fichiers définissent la structure des données échangées via l’API (requêtes et réponses).
+> Chaque schéma correspond à une version “validée” et “typée” des données, indépendante de la base.
+> Ils servent à vérifier que les données reçues ou envoyées respectent les règles attendues (types, champs obligatoires, valeurs par défaut).
+
+> Les schémas Pydantic sont essentiels pour garantir la fiabilité et la sécurité des échanges entre le frontend et le backend.
+> Ils permettent à FastAPI de valider automatiquement les données et de générer la documentation de l’API.
+
+#### Technos
+
+- **Pydantic :**
+  Pydantic est une bibliothèque Python qui permet de définir des modèles de données robustes et typés.
+  Elle vérifie automatiquement les types et les valeurs des champs, et facilite la conversion entre objets Python et formats JSON.
+
+#### Organisation
+
+- Un dossier `schemas/` dans ton backend, avec un fichier par modèle (ex : `trip.py`, `user.py`).
+- Pour chaque modèle, on crée généralement trois schémas :
+  - Un schéma de base (ex : `TripBase`)
+  - Un schéma de création (ex : `TripCreate`)
+  - Un schéma de lecture (ex : `TripRead`)
 
 
 ### Helpers
