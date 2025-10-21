@@ -14,6 +14,8 @@ En les créant d’abord, tu assures la cohérence et la fiabilité de ton site 
 
 - **SQLAlchemy :** SQLAlchemy est une bibliothèque Python qui sert d’ORM (Object Relational Mapper). Elle permet de manipuler la base de données avec du code Python, sans écrire de SQL directement. Tu crées des classes Python (modèles) qui représentent tes tables, et SQLAlchemy se charge de traduire tes actions en requêtes SQL.
 
+-----------------------------------
+
 ## Deuxième étape : Schémas Pydantic
 
 La deuxième étape consiste à créer les schémas Pydantic pour chaque modèle.
@@ -40,6 +42,39 @@ La deuxième étape consiste à créer les schémas Pydantic pour chaque modèle
   - Un schéma de création (ex : `TripCreate`)
   - Un schéma de lecture (ex : `TripRead`)
 
+------------------------------------
+
+# Troisième étape : Connexion et initialisation de la base de données
+
+La troisième étape consiste à connecter ton application à la base PostgreSQL et à initialiser la structure des tables à partir de tes modèles SQLAlchemy.
+
+> **Connexion à la base :**
+> Tu configures l’URL de connexion dans ton projet (ex : `DATABASE_URL`), qui contient le nom d’utilisateur, le mot de passe, le nom de la base et le port. Cela permet à SQLAlchemy d’accéder à ta base PostgreSQL.
+
+> **Initialisation des tables :**
+> Une fois la connexion établie, tu utilises SQLAlchemy pour créer toutes les tables définies dans tes modèles. Cela se fait avec une commande Python qui lit tes modèles et génère la structure dans la base.
+
+> Cette étape est essentielle pour que ton backend puisse stocker et manipuler des données réelles. Elle garantit que la structure de la base correspond exactement à tes modèles Python.
+
+#### Technos
+
+- **PostgreSQL :** Système de gestion de base de données relationnelle.
+- **SQLAlchemy :** ORM Python pour manipuler la base et créer les tables.
+- **psycopg2-binary :** Driver PostgreSQL pour Python.
+
+#### Commandes utiles
+
+- Créer les tables à partir des modèles :
+  ```bash
+  cd backend/
+  python -c "from app.db.session import Base, engine; from app.db.models import *; Base.metadata.create_all(bind=engine)"
+  ```
+
+- Vérifier la création des tables :
+  ```bash
+  psql -U <user> -d <base>
+  > \dt
+  ```
 
 ### Helpers
 
@@ -74,4 +109,38 @@ git push origin master
 
 ```{bash}
 npx create-react-app <nom-app>
+```
+
+##### Postgres SQL
+
+1. Démarrer un serveur, son état etc
+
+```{bash}
+sudo service postgresql start
+sudo service postgresql restart
+sudo service postgresql status
+```
+
+2. Créer un utilisateur
+
+```{bash}
+sudo -u postgres createuser --interactive
+```
+
+3. Créer une base de donnée
+
+```{bash}
+sudo -u postgres createdb nom_de_db --owner=nom_de_user
+```
+
+4. Entrer dans l'interpreteur de cmd
+
+```{bash}
+sudo -u postgres psql
+```
+
+5. Se connecter à la base
+
+```{bash}
+psql -U sdelannoy -d yalladb
 ```
