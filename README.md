@@ -78,6 +78,12 @@ La troisième étape consiste à connecter ton application à la base PostgreSQL
 
 ### Helpers
 
+##### Obtenir un fichier de représentation de base
+
+```{bash}
+sqlacodegen postgresql://sdelannoy:poilpoil@localhost:5432/yalladb --outfile models.py
+```
+
 ##### Init un repo
 
 ```{bash}
