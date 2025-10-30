@@ -6,3 +6,14 @@ DATABASE_URL = "postgresql://sdelannoy:poilpoil@localhost:5432/yalladb"
 engine = create_engine(DATABASE_URL, future=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 Base = declarative_base()
+
+def get_db():
+    """
+    FastAPI dependency: yield a SQLAlchemy session and ensure it's closed.
+    Utiliser dans les routers : db: Session = Depends(get_db)
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

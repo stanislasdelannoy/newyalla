@@ -31,4 +31,4 @@ class Activity(Base):
     trip_day = relationship("TripDay", back_populates="activities")
     user = relationship("User", back_populates="activities")
     main_category = relationship("MainCategory", back_populates="activities")
-    children = relationship("Activity", backref="parent", remote_side=[id], cascade="all, delete-orphan")
+    children = relationship("Activity", backref="parent", remote_side=[id], cascade="all, delete-orphan", single_parent=True)

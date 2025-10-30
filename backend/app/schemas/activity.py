@@ -28,3 +28,24 @@ class ActivityRead(ActivityBase):
 
     class Config:
         orm_mode = True
+
+class ActivityUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    establishment: Optional[str] = None
+    city: Optional[str] = None
+    address: Optional[str] = None
+    lon: Optional[float] = None
+    lat: Optional[float] = None
+    index: Optional[int] = None
+    google_place_identifier: Optional[str] = None
+    google_category: Optional[str] = None
+    url: Optional[str] = None
+    photo: Optional[str] = None
+    trip_day_id: Optional[int] = None
+    main_category_id: Optional[int] = None
+    user_id: Optional[int] = None
+    parent_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True

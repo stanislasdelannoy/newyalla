@@ -14,3 +14,11 @@ class TripDayRead(TripDayBase):
 
     class Config:
         orm_mode = True
+
+class TripDayUpdate(BaseModel):
+    title: Optional[str] = None
+    date: Optional[str] = None
+    trip_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
