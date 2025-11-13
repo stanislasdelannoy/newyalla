@@ -40,9 +40,9 @@ def get_user_trips(db: Session, user_id: int) -> List[Trip]:
     return trips
 
 
-def create_trip(db: Session, owner_id: int, trip_in: Any) -> Trip:
+def create_trip(db: Session, user_id: int, trip_in: Any) -> Trip:
     data = trip_in.dict() if hasattr(trip_in, "dict") else dict(trip_in)
-    data["owner_id"] = owner_id
+    data["user_id"] = user_id
     trip = Trip(**data)
     db.add(trip)
     db.commit()

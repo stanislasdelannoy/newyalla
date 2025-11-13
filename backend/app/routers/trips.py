@@ -19,9 +19,9 @@ def search_trips(city: str = Query(...), db: Session = Depends(get_db)):
     return search_trips(db, city=city)
 
 @router.post("", response_model=TripRead, status_code=201)
-def create_trip(payload: TripCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+def create_trip(payload: TripCreate, db: Session = Depends(get_db)): #, current_user=Depends(get_current_user))
     from app.crud import create_trip
-    return create_trip(db, owner_id=current_user.id, trip_in=payload)
+    return create_trip(db, user_id=1, trip_in=payload)    # Remplacer 1 par current_user.id
 
 @router.get("/{trip_id}", response_model=TripRead)
 def get_trip(trip_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user_optional)):
