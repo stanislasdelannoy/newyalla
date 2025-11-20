@@ -2,4 +2,6 @@ backend/db/__pycache__/
 rails_to_fastapi_guide.md
 old/
 models.py
-**/__pycache__
+__pycache__/
+*.pyc
+*.pyo

@@ -3,7 +3,16 @@ import { apiGet } from "./client";
 export type Trip = {
   id: number;
   title: string;
-  // ajoute d'autres champs si tu veux (description, dates, etc.)
+  description?: string | null;
+  category?: string | null;
+  city?: string | null;
+  country?: string | null;
+  lat?: number | null;
+  lon?: number | null;
+  photo?: string | null;
+  public?: boolean;
+  user_id?: number;
+  
 };
 
 export async function fetchTrips(): Promise<Trip[]> {
