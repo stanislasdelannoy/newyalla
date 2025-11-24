@@ -97,10 +97,10 @@ def toggle_like(db: Session, user_id: int, trip_id: int) -> None:
 
 
 # ---------- Activities ----------
-def create_activity_for_trip(db: Session, trip_id: int, creator_id: int, activity_in: Any) -> Activity:
+def create_activity_for_trip(db: Session, trip_id: int, user_id: int, activity_in: Any) -> Activity:
     data = activity_in.dict() if hasattr(activity_in, "dict") else dict(activity_in)
     data["trip_id"] = trip_id
-    data["creator_id"] = creator_id
+    data["user_id"] = user_id
     activity = Activity(**data)
     db.add(activity)
     db.commit()

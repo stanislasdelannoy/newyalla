@@ -5,6 +5,8 @@ import { fetchTrip } from "../api/trips";
 import type { Trip } from "../api/trips";
 import { fetchTripDays } from "../api/tripDays";
 import type { TripDay } from "../api/tripDays";
+import { fetchActivitiesForDay } from "../api/tripActivities";
+import type { Activity } from "../api/tripActivities"
 
 export default function TripDetail() {
   const { id } = useParams();
@@ -15,6 +17,7 @@ export default function TripDetail() {
   const [loadingTrip, setLoadingTrip] = useState(true);
   const [loadingDays, setLoadingDays] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activitiesByDay, setActivitiesByDay] = useState<Record<number, Activity[]>>({});
 
   // Chargement du trip
   useEffect(() => {
@@ -52,6 +55,23 @@ export default function TripDetail() {
         setLoadingDays(false);
       });
   }, [tripId]);
+
+  useEffect(() => {
+  if (tripDays.length === 0) return;
+
+  tripDays.forEach((day) => {
+    fetchActivitiesForDay(day.id)
+      .then((acts) => {
+        setActivitiesByDay((prev) => ({
+          ...prev,
+          [day.id]: acts,
+        }));
+      })
+      .catch((err) => {
+        console.error("Erreur lors du chargement des activités:", err);
+      });
+  });
+}, [tripDays]);
 
   if (loadingTrip) return <p>Chargement du voyage...</p>;
   if (error) return <p>Erreur : {error}</p>;
@@ -93,14 +113,28 @@ export default function TripDetail() {
         {!loadingDays && tripDays.length > 0 && (
           <ol>
             {tripDays.map((day) => (
-              <li key={day.id}>
+              <li key={day.id} style={{ marginBottom: "1rem" }}>
                 <strong>{day.title || "Jour sans titre"}</strong>
-                {day.date && (
-                  <>
-                    {" "}
-                    – <em>{day.date}</em>
-                  </>
-                )}
+                {day.date && <> – <em>{day.date}</em></>}
+
+                <ul style={{ marginTop: "0.5rem", paddingLeft: "1.2rem" }}>
+                  {activitiesByDay[day.id] && activitiesByDay[day.id].length > 0 ? (
+                    activitiesByDay[day.id].map((act) => (
+                      <li key={act.id}>
+                        <strong>{act.title}</strong>
+                        {act.city && <> – {act.city}</>}
+                        {act.description && (
+                          <>
+                            <br />
+                            <em>{act.description}</em>
+                          </>
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    <li><em>Aucune activité pour ce jour.</em></li>
+                  )}
+                </ul>
               </li>
             ))}
           </ol>
