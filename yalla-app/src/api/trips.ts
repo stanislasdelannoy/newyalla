@@ -1,4 +1,4 @@
-import { apiGet } from "./client";
+import { apiGet, apiPost } from "./client";
 
 export type Trip = {
   id: number;
@@ -12,7 +12,7 @@ export type Trip = {
   photo?: string | null;
   public?: boolean;
   user_id?: number;
-  
+
 };
 
 export async function fetchTrips(): Promise<Trip[]> {
@@ -21,4 +21,17 @@ export async function fetchTrips(): Promise<Trip[]> {
 
 export async function fetchTrip(trip_id: number): Promise<Trip> {
   return apiGet<Trip>(`/api/trips/${trip_id}`);
+}
+
+export type TripCreatePayload = {
+  title: string;
+  description?: string;
+  city?: string;
+  country?: string;
+};
+
+export async function createTrip(
+  data: TripCreatePayload,
+): Promise<Trip> {
+  return apiPost<Trip, TripCreatePayload>("/api/trips", data);
 }

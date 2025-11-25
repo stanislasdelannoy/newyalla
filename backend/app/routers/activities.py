@@ -27,19 +27,30 @@ def create_activity_for_trip_day(
     from app.db.models.trip_day import TripDay
     from app.crud import create_activity_for_trip
 
-    # On vérifie que le TripDay existe et on récupère le trip_id associé
     trip_day = db.query(TripDay).filter(TripDay.id == trip_day_id).first()
     if not trip_day:
         raise HTTPException(status_code=404, detail="TripDay not found")
 
-    activity_in = ActivityCreate(
-        **payload.model_dump(),
-        trip_id=trip_day.trip_id,
-        trip_day_id=trip_day_id,
+    user_id = 1  # temporaire tant qu'on n'a pas remis l'auth
+
+    # on enlève trip_id / trip_day_id / user_id du dict avant de passer à ActivityCreate
+    base_data = payload.model_dump(
+        exclude={"trip_id", "trip_day_id", "user_id"},
     )
 
-    activity = create_activity_for_trip(db, activity_in=activity_in)
-    return activity
+    activity_in = ActivityCreate(
+        **base_data,
+        trip_id=trip_day.trip_id,
+        trip_day_id=trip_day_id,
+        user_id=user_id,
+    )
+
+    return create_activity_for_trip(
+        db=db,
+        trip_id=trip_day.trip_id,
+        user_id=user_id,
+        activity_in=activity_in,
+    )
 
 @router.get("/api/trip_days/{trip_day_id}/activities", response_model=List[ActivityRead])
 def list_activities_for_trip_day(
@@ -50,7 +61,7 @@ def list_activities_for_trip_day(
     activities = (
         db.query(Activity)
         .filter(Activity.trip_day_id == trip_day_id)
-        .order_by(Activity.position.asc().nulls_last(), Activity.id.asc())
+        .order_by(Activity.index.asc().nulls_last(), Activity.id.asc())
         .all()
     )
     return activities
