@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchTrip } from "../api/trips";
 import type { Trip } from "../api/trips";
-import { fetchTripDays } from "../api/tripDays";
+import { fetchTripDays, createTripDay } from "../api/tripDays";
 import type { TripDay } from "../api/tripDays";
 import {
   fetchActivitiesForDay,
@@ -21,6 +21,8 @@ export default function TripDetail() {
   const [loadingDays, setLoadingDays] = useState(true);
   const [errorTrip, setErrorTrip] = useState<string | null>(null);
   const [errorDays, setErrorDays] = useState<string | null>(null);
+  const [newDayTitle, setNewDayTitle] = useState("");
+  const [newDayDate, setNewDayDate] = useState("");
 
   // activités par jour : { [dayId]: Activity[] }
   const [activitiesByDay, setActivitiesByDay] = useState<
@@ -34,6 +36,27 @@ export default function TripDetail() {
   const [newActivityDescription, setNewActivityDescription] = useState<
     Record<number, string>
   >({});
+
+  const handleCreateTripDay = async () => {
+  if (!tripId) return;
+
+  try {
+    await createTripDay(tripId, {
+      title: newDayTitle || undefined,
+      date: newDayDate || undefined, // format "YYYY-MM-DD" depuis input type="date"
+    });
+
+    // reset form
+    setNewDayTitle("");
+    setNewDayDate("");
+
+    // re-fetch des jours
+    const updatedDays = await fetchTripDays(tripId);
+    setTripDays(updatedDays);
+  } catch (err) {
+    console.error("Erreur lors de la création du jour:", err);
+  }
+};
 
   // Charger le trip
   useEffect(() => {
@@ -120,6 +143,24 @@ export default function TripDetail() {
 
       <section style={{ marginTop: "2rem" }}>
         <h2>Jours du voyage</h2>
+
+         {/* Formulaire de création de TripDay */}
+        <div style={{ marginBottom: "1rem" }}>
+          <input
+            type="text"
+            placeholder="Titre du jour (optionnel)"
+            value={newDayTitle}
+            onChange={(e) => setNewDayTitle(e.target.value)}
+            style={{ marginRight: "0.5rem" }}
+          />
+          <input
+            type="date"
+            value={newDayDate}
+            onChange={(e) => setNewDayDate(e.target.value)}
+            style={{ marginRight: "0.5rem" }}
+          />
+          <button onClick={handleCreateTripDay}>Ajouter un jour</button>
+        </div>
 
         {loadingDays ? (
           <p>Chargement des jours...</p>
