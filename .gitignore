@@ -3,3 +3,16 @@ rails_to_fastapi_guide.md
 old/
 models.py
 **/__pycache__
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+build/
