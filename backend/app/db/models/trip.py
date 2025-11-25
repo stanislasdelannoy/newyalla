@@ -7,7 +7,7 @@ class Trip(Base):
     __tablename__ = "trips"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String)
+    title = Column(String, nullable=False)
     description = Column(String)
     category = Column(String)
     city = Column(String)
