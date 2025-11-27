@@ -15,7 +15,7 @@ def create_trip_day_under_trip(trip_id: int, payload: TripDayCreate, db: Session
     return create_trip_day(db, trip_id=trip_id, payload=payload, user=1)
 
 @router.get("/api/trips/{trip_id}/trip_days", response_model=List[TripDayRead], status_code=201)
-def list_trip_days_under_trip(trip_id: int, db: Session = Depends(get_db)): #, current_user=Depends(get_current_user)
+def list_trip_days_under_trip(trip_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     trip_days = (
         db.query(TripDay)
         .filter(TripDay.trip_id == trip_id)
