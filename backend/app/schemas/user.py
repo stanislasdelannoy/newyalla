@@ -3,9 +3,9 @@ from typing import Optional
 
 class UserBase(BaseModel):
     email: EmailStr
-    encrypted_password: str
-    sign_in_count: int = 0
-    admin: bool = False
+    # encrypted_password: str
+    # sign_in_count: int = 0
+    # admin: bool = False
 
     reset_password_token: Optional[str] = None
     reset_password_sent_at: Optional[str] = None
@@ -27,7 +27,8 @@ class UserBase(BaseModel):
     token_expiry: Optional[str] = None
 
 class UserCreate(UserBase):
-    pass
+    email: EmailStr
+    password: str
 
 class UserRead(UserBase):
     id: int
