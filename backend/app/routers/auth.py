@@ -30,9 +30,13 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
+from sqlalchemy import text
+
 @router.post("/login", response_model=Token)
 def login(user_in: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == user_in.email).first()
+    print("📌 user trouvé =", user)
+
     if not user:
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
@@ -40,5 +44,4 @@ def login(user_in: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     access_token = create_access_token({"sub": str(user.id)})
-
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
