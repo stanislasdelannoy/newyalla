@@ -130,7 +130,7 @@ export default function TripDetail() {
   return (
     <div style={{ padding: "1rem" }}>
       <p>
-        <Link to="/">&larr; Retour à la liste des voyages</Link>
+        <Link to="/trips">&larr; Retour à la liste des voyages</Link>
       </p>
 
       <h1>{trip.title}</h1>

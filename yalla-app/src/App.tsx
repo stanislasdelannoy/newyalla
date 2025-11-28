@@ -1,11 +1,24 @@
-import { Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import TripsList from "./pages/TripsList";
+import TripDetail from "./pages/TripDetail";
 
 function App() {
   return (
-    <div style={{ padding: "1rem" }}>
-      <h1>Yalla Travel Planner</h1>
-      <Outlet /> {/* Ici s'affichent les pages */}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Page liste des trips */}
+        <Route path="/trips" element={<TripsList />} />
+
+        {/* Page détail d’un trip */}
+        <Route path="/trips/:id" element={<TripDetail />} />
+
+        {/* route par défaut → login (ou trips si tu préfères) */}
+        <Route path="*" element={<LoginPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

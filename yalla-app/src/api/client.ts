@@ -5,17 +5,30 @@ const buildUrl = (path: string) => {
   return `${API_BASE_URL.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
 };
 
+// 🔐 Ajout : construit les headers avec le token si présent
+function withAuthHeaders(base: HeadersInit = {}): HeadersInit {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return base;
+  }
+
+  return {
+    ...base,
+    Authorization: `Bearer ${token}`,
+  };
+}
+
 export async function apiGet<T>(path: string): Promise<T> {
   const response = await fetch(buildUrl(path), {
     method: "GET",
-    headers: {
+    headers: withAuthHeaders({
       "Content-Type": "application/json",
-    },
-    credentials: "include", // utile plus tard si tu utilises des cookies/session
+    }),
+    credentials: "include", // tu peux garder pour les cookies plus tard
   });
 
   if (!response.ok) {
-    // tu peux améliorer ça plus tard (gestion d’erreurs globale)
     const text = await response.text();
     throw new Error(
       `GET ${path} failed: ${response.status} ${response.statusText} - ${text}`,
@@ -31,9 +44,9 @@ export async function apiPost<T, B = unknown>(
 ): Promise<T> {
   const response = await fetch(buildUrl(path), {
     method: "POST",
-    headers: {
+    headers: withAuthHeaders({
       "Content-Type": "application/json",
-    },
+    }),
     credentials: "include",
     body: JSON.stringify(body),
   });
@@ -54,9 +67,9 @@ export async function apiPut<T, B = unknown>(
 ): Promise<T> {
   const response = await fetch(buildUrl(path), {
     method: "PUT",
-    headers: {
+    headers: withAuthHeaders({
       "Content-Type": "application/json",
-    },
+    }),
     credentials: "include",
     body: JSON.stringify(body),
   });
@@ -74,9 +87,9 @@ export async function apiPut<T, B = unknown>(
 export async function apiDelete<T = void>(path: string): Promise<T> {
   const response = await fetch(buildUrl(path), {
     method: "DELETE",
-    headers: {
+    headers: withAuthHeaders({
       "Content-Type": "application/json",
-    },
+    }),
     credentials: "include",
   });
 
@@ -87,7 +100,6 @@ export async function apiDelete<T = void>(path: string): Promise<T> {
     );
   }
 
-  // certains DELETE ne renvoient rien
   const text = await response.text();
-  return (text ? (JSON.parse(text) as T) : (undefined as T));
+  return text ? (JSON.parse(text) as T) : (undefined as T);
 }
