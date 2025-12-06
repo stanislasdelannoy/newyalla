@@ -8,15 +8,19 @@ const buildUrl = (path: string) => {
 // 🔐 Ajout : construit les headers avec le token si présent
 function withAuthHeaders(base: HeadersInit = {}): HeadersInit {
   const token = localStorage.getItem("token");
+  console.log("🔑 token localStorage =", token);
 
   if (!token) {
     return base;
   }
 
-  return {
+  const headers: HeadersInit = {
     ...base,
     Authorization: `Bearer ${token}`,
   };
+
+  console.log("📤 headers envoyés =", headers);
+  return headers;
 }
 
 export async function apiGet<T>(path: string): Promise<T> {
