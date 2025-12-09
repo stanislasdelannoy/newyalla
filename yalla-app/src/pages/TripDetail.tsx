@@ -10,6 +10,8 @@ import {
   createActivityForDay,
 } from "../api/tripActivities";
 import type { Activity } from "../api/tripActivities";
+import { FormField } from "../components/FormField";
+import "./style/TripDetail.css";
 
 export default function TripDetail() {
   const { id } = useParams();
@@ -21,6 +23,7 @@ export default function TripDetail() {
   const [loadingDays, setLoadingDays] = useState(true);
   const [errorTrip, setErrorTrip] = useState<string | null>(null);
   const [errorDays, setErrorDays] = useState<string | null>(null);
+
   const [newDayTitle, setNewDayTitle] = useState("");
   const [newDayDate, setNewDayDate] = useState("");
 
@@ -38,25 +41,23 @@ export default function TripDetail() {
   >({});
 
   const handleCreateTripDay = async () => {
-  if (!tripId) return;
+    if (!tripId) return;
 
-  try {
-    await createTripDay(tripId, {
-      title: newDayTitle || undefined,
-      date: newDayDate || undefined, // format "YYYY-MM-DD" depuis input type="date"
-    });
+    try {
+      await createTripDay(tripId, {
+        title: newDayTitle || undefined,
+        date: newDayDate || undefined, // "YYYY-MM-DD"
+      });
 
-    // reset form
-    setNewDayTitle("");
-    setNewDayDate("");
+      setNewDayTitle("");
+      setNewDayDate("");
 
-    // re-fetch des jours
-    const updatedDays = await fetchTripDays(tripId);
-    setTripDays(updatedDays);
-  } catch (err) {
-    console.error("Erreur lors de la création du jour:", err);
-  }
-};
+      const updatedDays = await fetchTripDays(tripId);
+      setTripDays(updatedDays);
+    } catch (err) {
+      console.error("Erreur lors de la création du jour:", err);
+    }
+  };
 
   // Charger le trip
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function TripDetail() {
       });
   }, [tripId]);
 
-  // Charger les activités pour chaque TripDay dès qu'on a la liste des jours
+  // Charger les activités pour chaque TripDay
   useEffect(() => {
     if (tripDays.length === 0) return;
 
@@ -112,170 +113,223 @@ export default function TripDetail() {
   }, [tripDays]);
 
   if (!tripId) {
-    return <p>Trip invalide.</p>;
+    return <div className="trip-detail-shell">Trip invalide.</div>;
   }
 
   if (loadingTrip) {
-    return <p>Chargement du voyage...</p>;
+    return (
+      <div className="trip-detail-shell">Chargement du voyage…</div>
+    );
   }
 
   if (errorTrip) {
-    return <p>Erreur lors du chargement du voyage : {errorTrip}</p>;
+    return (
+      <div className="trip-detail-shell">
+        Erreur lors du chargement du voyage : {errorTrip}
+      </div>
+    );
   }
 
   if (!trip) {
-    return <p>Voyage introuvable.</p>;
+    return (
+      <div className="trip-detail-shell">Voyage introuvable.</div>
+    );
   }
 
+  const locationLabel =
+    trip.city && trip.country
+      ? `${trip.city}, ${trip.country}`
+      : trip.city || trip.country || "";
+
   return (
-    <div style={{ padding: "1rem" }}>
-      <p>
-        <Link to="/trips">&larr; Retour à la liste des voyages</Link>
-      </p>
-
-      <h1>{trip.title}</h1>
-      {trip.description && <p>{trip.description}</p>}
-      <p>
-        {trip.city && trip.country
-          ? `${trip.city}, ${trip.country}`
-          : trip.city || trip.country}
-      </p>
-
-      <section style={{ marginTop: "2rem" }}>
-        <h2>Jours du voyage</h2>
-
-         {/* Formulaire de création de TripDay */}
-        <div style={{ marginBottom: "1rem" }}>
-          <input
-            type="text"
-            placeholder="Titre du jour (optionnel)"
-            value={newDayTitle}
-            onChange={(e) => setNewDayTitle(e.target.value)}
-            style={{ marginRight: "0.5rem" }}
-          />
-          <input
-            type="date"
-            value={newDayDate}
-            onChange={(e) => setNewDayDate(e.target.value)}
-            style={{ marginRight: "0.5rem" }}
-          />
-          <button onClick={handleCreateTripDay}>Ajouter un jour</button>
+    <div className="trip-detail-shell">
+      <header className="trip-detail-header">
+        <div className="trip-detail-header-top">
+          <Link to="/trips" className="back-link">
+            &larr; Retour aux voyages
+          </Link>
         </div>
 
-        {loadingDays ? (
-          <p>Chargement des jours...</p>
-        ) : errorDays ? (
-          <p>Erreur lors du chargement des jours : {errorDays}</p>
-        ) : tripDays.length === 0 ? (
-          <p>Aucun jour pour ce voyage pour le moment.</p>
-        ) : (
-          <ol>
-            {tripDays.map((day) => (
-              <li key={day.id} style={{ marginBottom: "2rem" }}>
-                <div>
-                  <strong>{day.title || "Jour sans titre"}</strong>
-                  {day.date && (
-                    <>
-                      {" "}
-                      – <em>{day.date}</em>
-                    </>
-                  )}
-                </div>
+        <div className="trip-detail-hero">
+          <div>
+            <h1>{trip.title}</h1>
+            {locationLabel && (
+              <p className="trip-detail-location">{locationLabel}</p>
+            )}
+            {trip.description && (
+              <p className="trip-detail-description">
+                {trip.description}
+              </p>
+            )}
+          </div>
+        </div>
+      </header>
 
-                {/* Formulaire d'ajout d'activité pour ce jour */}
-                <div style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}>
-                  <input
-                    type="text"
-                    placeholder="Nouvelle activité..."
-                    value={newActivityTitle[day.id] || ""}
-                    onChange={(e) =>
-                      setNewActivityTitle({
-                        ...newActivityTitle,
-                        [day.id]: e.target.value,
-                      })
-                    }
-                    style={{ marginRight: "0.5rem" }}
-                  />
+      <main className="trip-detail-main">
+        <section className="trip-days-section">
+          <div className="trip-days-header-row">
+            <h2>Jours du voyage</h2>
+            <div className="trip-days-create-card">
+              <h3>Ajouter un jour</h3>
+              <div className="trip-days-create-form">
+                <FormField
+                  label="Titre du jour"
+                  name="dayTitle"
+                  value={newDayTitle}
+                  onChange={setNewDayTitle}
+                  placeholder="Jour 1 — Arrivée à Lisbonne"
+                />
+                <FormField
+                  label="Date"
+                  name="dayDate"
+                  value={newDayDate}
+                  onChange={setNewDayDate}
+                  type="date"
+                  required={false}
+                />
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={handleCreateTripDay}
+                >
+                  Ajouter un jour
+                </button>
+              </div>
+            </div>
+          </div>
 
-                  <input
-                    type="text"
-                    placeholder="Description (optionnelle)"
-                    value={newActivityDescription[day.id] || ""}
-                    onChange={(e) =>
-                      setNewActivityDescription({
-                        ...newActivityDescription,
-                        [day.id]: e.target.value,
-                      })
-                    }
-                    style={{ marginRight: "0.5rem" }}
-                  />
-
-                  <button
-                    onClick={async () => {
-                      const title = newActivityTitle[day.id];
-                      if (!title) return;
-
-                      try {
-                        await createActivityForDay(day.id, {
-                          title,
-                          description:
-                            newActivityDescription[day.id] || null,
-                        });
-
-                        // reset du formulaire pour ce jour
-                        setNewActivityTitle((prev) => ({
-                          ...prev,
-                          [day.id]: "",
-                        }));
-                        setNewActivityDescription((prev) => ({
-                          ...prev,
-                          [day.id]: "",
-                        }));
-
-                        // recharger les activités de ce jour uniquement
-                        const updated = await fetchActivitiesForDay(day.id);
-                        setActivitiesByDay((prev) => ({
-                          ...prev,
-                          [day.id]: updated,
-                        }));
-                      } catch (err) {
-                        console.error(
-                          "Erreur lors de la création de l'activité :",
-                          err,
-                        );
-                      }
-                    }}
-                  >
-                    Ajouter une activité
-                  </button>
-                </div>
-
-                {/* Liste des activités pour ce jour */}
-                <ul style={{ marginTop: "0.5rem", paddingLeft: "1.2rem" }}>
-                  {activitiesByDay[day.id] &&
-                  activitiesByDay[day.id].length > 0 ? (
-                    activitiesByDay[day.id].map((act) => (
-                      <li key={act.id}>
-                        <strong>{act.title}</strong>
-                        {act.description && (
-                          <>
-                            {" "}
-                            – <em>{act.description}</em>
-                          </>
+          {loadingDays ? (
+            <p>Chargement des jours…</p>
+          ) : errorDays ? (
+            <p>Erreur lors du chargement des jours : {errorDays}</p>
+          ) : tripDays.length === 0 ? (
+            <p>Aucun jour pour ce voyage pour le moment.</p>
+          ) : (
+            <ol className="trip-days-list">
+              {tripDays.map((day, index) => (
+                <li key={day.id}>
+                  <article className="trip-day-card">
+                    <div className="trip-day-header">
+                      <div>
+                        <span className="trip-day-index">
+                          Jour {index + 1}
+                        </span>
+                        <h3>
+                          {day.title || "Jour sans titre"}
+                        </h3>
+                        {day.date && (
+                          <p className="trip-day-date">
+                            {day.date}
+                          </p>
                         )}
-                      </li>
-                    ))
-                  ) : (
-                    <li>
-                      <em>Aucune activité pour ce jour.</em>
-                    </li>
-                  )}
-                </ul>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
+                      </div>
+                    </div>
+
+                    <div className="trip-day-body">
+                      {/* Formulaire d'ajout d'activité */}
+                      <div className="activity-form">
+                        <h4>Ajouter une activité</h4>
+                        <FormField
+                          label="Titre"
+                          name={`activityTitle-${day.id}`}
+                          value={newActivityTitle[day.id] || ""}
+                          onChange={(value) =>
+                            setNewActivityTitle((prev) => ({
+                              ...prev,
+                              [day.id]: value,
+                            }))
+                          }
+                          placeholder="Brunch, visite, plage…"
+                          required
+                        />
+                        <FormField
+                          label="Description"
+                          name={`activityDescription-${day.id}`}
+                          value={newActivityDescription[day.id] || ""}
+                          onChange={(value) =>
+                            setNewActivityDescription((prev) => ({
+                              ...prev,
+                              [day.id]: value,
+                            }))
+                          }
+                          placeholder="Notes, adresse, horaires…"
+                          as="textarea"
+                        />
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          onClick={async () => {
+                            const title = newActivityTitle[day.id];
+                            if (!title) return;
+
+                            try {
+                              await createActivityForDay(day.id, {
+                                title,
+                                description:
+                                  newActivityDescription[day.id] || null,
+                              });
+
+                              // reset du formulaire pour ce jour
+                              setNewActivityTitle((prev) => ({
+                                ...prev,
+                                [day.id]: "",
+                              }));
+                              setNewActivityDescription((prev) => ({
+                                ...prev,
+                                [day.id]: "",
+                              }));
+
+                              // recharger les activités de ce jour
+                              const updated =
+                                await fetchActivitiesForDay(day.id);
+                              setActivitiesByDay((prev) => ({
+                                ...prev,
+                                [day.id]: updated,
+                              }));
+                            } catch (err) {
+                              console.error(
+                                "Erreur lors de la création de l'activité :",
+                                err,
+                              );
+                            }
+                          }}
+                        >
+                          Ajouter l’activité
+                        </button>
+                      </div>
+
+                      {/* Liste des activités */}
+                      <div className="activity-list">
+                        <h4>Activités</h4>
+                        {activitiesByDay[day.id] &&
+                        activitiesByDay[day.id].length > 0 ? (
+                          <ul>
+                            {activitiesByDay[day.id].map((act) => (
+                              <li key={act.id}>
+                                <strong>{act.title}</strong>
+                                {act.description && (
+                                  <span className="activity-description">
+                                    {" "}
+                                    – {act.description}
+                                  </span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="activity-empty">
+                            Aucune activité pour ce jour.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+      </main>
     </div>
   );
 }

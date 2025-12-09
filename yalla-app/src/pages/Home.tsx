@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { getTrips } from "../api"
-import TripCard from "../components/TripCard"
+import { getTrips } from "../api/trips"
+import { TripCard } from "../components/TripCard"
 
 export default function Home() {
   const [trips, setTrips] = useState<any[]>([])
