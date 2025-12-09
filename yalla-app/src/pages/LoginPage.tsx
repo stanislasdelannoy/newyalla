@@ -1,17 +1,28 @@
 // src/pages/LoginPage.tsx
-import { useState, FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { login, register } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import { FormField } from "../components/FormField";
+import "./style/AuthPage.css";
 
-const LoginPage = () => {
+export default function AuthPage() {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
+  const [hometown, setHometown] = useState("");
+
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // ← IMPORTANT
+  const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -21,86 +32,127 @@ const LoginPage = () => {
 
     try {
       if (isRegisterMode) {
-        // REGISTER
-        await register({ email, password });
+        await register({
+          email,
+          password,
+          first_name: firstName,
+          last_name: lastName,
+          username: username || undefined,
+          phone: phone || undefined,
+          hometown: hometown || undefined,
+        });
 
-        // Si tu veux rediriger immédiatement après register :
-        localStorage.setItem("token", "TEMP"); // si ton register ne renvoie pas de token
-        navigate("/trips");
-
-        // Si tu préfères obliger l'utilisateur à se loguer ensuite :
-        // setInfo("Compte créé, tu peux maintenant te connecter.");
-        // setIsRegisterMode(false);
+        setInfo("Compte créé. Tu peux maintenant te connecter.");
+        setIsRegisterMode(false);
       } else {
-        // LOGIN
         const token = await login({ email, password });
-
-        // Stockage du token
         localStorage.setItem("token", token.access_token);
 
-        // Redirection après login
         navigate("/trips");
       }
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Erreur");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: "2rem auto" }}>
-      <h1>{isRegisterMode ? "Créer un compte" : "Login"}</h1>
+    <div className="auth-shell">
+      <div className="auth-card">
+        <h1 className="auth-title">
+          {isRegisterMode ? "Créer un compte" : "Connexion"}
+        </h1>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>
-            Email<br />
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-            />
-          </label>
-        </div>
+        <form onSubmit={handleSubmit} className="auth-form">
 
-        <div style={{ marginBottom: "1rem" }}>
-          <label>
-            Mot de passe<br />
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-          </label>
-        </div>
+          <FormField
+            label="Email"
+            name="email"
+            value={email}
+            onChange={setEmail}
+            type="email"
+            required
+            placeholder="ex: john@gmail.com"
+          />
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {info && <p style={{ color: "green" }}>{info}</p>}
+          <FormField
+            label="Mot de passe"
+            name="password"
+            value={password}
+            onChange={setPassword}
+            type="password"
+            required
+          />
 
-        <button type="submit" disabled={loading}>
-          {loading
-            ? isRegisterMode ? "Création..." : "Connexion..."
-            : isRegisterMode ? "S'inscrire" : "Se connecter"}
-        </button>
-      </form>
+          {isRegisterMode && (
+            <>
+              <FormField
+                label="Prénom"
+                name="firstName"
+                value={firstName}
+                onChange={setFirstName}
+                required
+              />
+              <FormField
+                label="Nom"
+                name="lastName"
+                value={lastName}
+                onChange={setLastName}
+                required
+              />
+              <FormField
+                label="Username"
+                name="username"
+                value={username}
+                onChange={setUsername}
+                placeholder="facultatif"
+              />
+              <FormField
+                label="Téléphone"
+                name="phone"
+                value={phone}
+                onChange={setPhone}
+                placeholder="facultatif"
+              />
+              <FormField
+                label="Ville d'origine"
+                name="hometown"
+                value={hometown}
+                onChange={setHometown}
+                placeholder="facultatif"
+              />
+            </>
+          )}
 
-      <div style={{ marginTop: "1rem" }}>
-        {isRegisterMode ? (
-          <button type="button" onClick={() => setIsRegisterMode(false)}>
-            Déjà un compte ? Se connecter
+          {error && <p className="auth-error">{error}</p>}
+          {info && <p className="auth-info">{info}</p>}
+
+          <button
+            type="submit"
+            className="auth-submit"
+            disabled={loading}
+          >
+            {loading
+              ? "Chargement..."
+              : isRegisterMode
+              ? "Créer un compte"
+              : "Se connecter"}
           </button>
-        ) : (
-          <button type="button" onClick={() => setIsRegisterMode(true)}>
-            Pas encore de compte ? S'inscrire
-          </button>
-        )}
+        </form>
+
+        <div className="auth-switch">
+          {isRegisterMode ? (
+            <button type="button" onClick={() => setIsRegisterMode(false)}>
+              Déjà un compte ? Se connecter
+            </button>
+          ) : (
+            <button type="button" onClick={() => setIsRegisterMode(true)}>
+              Pas encore de compte ? S'inscrire
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

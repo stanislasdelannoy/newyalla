@@ -9,9 +9,9 @@ from app.core.auth import get_password_hash, verify_password, create_access_toke
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-@router.post("/register", response_model=UserRead, status_code=201)
+@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    # vérifier si email déjà pris
+    # 1) Email déjà utilisé ?
     existing = db.query(User).filter(User.email == user_in.email).first()
     if existing:
         raise HTTPException(
@@ -19,16 +19,25 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             detail="Email already registered",
         )
 
-    db_user = User(
+    # 2) Création du user
+    hashed_password = get_password_hash(user_in.password)
+
+    user = User(
         email=user_in.email,
-        encrypted_password=get_password_hash(user_in.password),
-        sign_in_count=0,
-        # mets created_at/updated_at par défaut en DB si possible
+        encrypted_password=hashed_password,
+        first_name=user_in.first_name,
+        last_name=user_in.last_name,
+        username=user_in.username or user_in.email.split("@")[0],
+        phone=user_in.phone,
+        hometown=user_in.hometown,
+        # le reste (sign_in_count, created_at, etc.) est géré par les defaults du modèle
     )
-    db.add(db_user)
+
+    db.add(user)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(user)
+
+    return user
 
 from sqlalchemy import text
 

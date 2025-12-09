@@ -32,14 +32,17 @@ export async function login(payload: LoginPayload): Promise<TokenResponse> {
 export type RegisterPayload = {
   email: string;
   password: string;
+  first_name: string;
+  last_name: string;
+  username?: string;
+  phone?: string;
+  hometown?: string;
 };
 
 export async function register(payload: RegisterPayload): Promise<void> {
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 

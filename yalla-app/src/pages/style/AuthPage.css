@@ -1,0 +1,76 @@
+.auth-shell {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.auth-title {
+  font-size: 1.7rem;
+  margin-bottom: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.auth-error {
+  color: #dc2626;
+  text-align: center;
+  margin-top: -0.5rem;
+  font-size: 0.9rem;
+}
+
+.auth-info {
+  color: #059669;
+  text-align: center;
+  margin-top: -0.5rem;
+  font-size: 0.9rem;
+}
+
+.auth-submit {
+  background: linear-gradient(135deg, #4f46e5, #16a3ff);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.auth-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  color: #6366f1;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.auth-switch button:hover {
+  text-decoration: underline;
+}
