@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.deps import get_current_user, get_current_user_optional
 from app.schemas.trip import TripRead, TripCreate, TripUpdate
+from app.db.models import Trip
 
 router = APIRouter(prefix="/api/trips", tags=["trips"])
 
@@ -21,14 +22,18 @@ def search_trips(city: str = Query(...), db: Session = Depends(get_db)):
 @router.post("", response_model=TripRead, status_code=201)
 def create_trip(payload: TripCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     from app.crud import create_trip
-    return create_trip(db, user_id=current_user.id, trip_in=payload)    # Remplacer 1 par current_user.id
+    return create_trip(db, user_id=current_user.id, trip_in=payload)
+
 
 @router.get("/{trip_id}", response_model=TripRead)
 def get_trip(trip_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user_optional)):
-    from app.crud import get_trip
-    trip = get_trip(db, trip_id)
+    trip = db.query(Trip).filter(Trip.id == trip_id).first()
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")
+
+    if (not current_user.admin) and (trip.user_id != current_user.id):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     return trip
 
 @router.put("/{trip_id}", response_model=TripRead)

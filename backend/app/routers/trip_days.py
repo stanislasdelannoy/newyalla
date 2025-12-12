@@ -6,6 +6,7 @@ from app.db.session import get_db
 from app.deps import get_current_user
 from app.schemas.trip_day import TripDayCreate, TripDayRead, TripDayUpdate
 from app.db.models.trip_day import TripDay
+from app.db.models import Trip
 
 router = APIRouter(tags=["trip_days"])
 
@@ -15,7 +16,18 @@ def create_trip_day_under_trip(trip_id: int, payload: TripDayCreate, db: Session
     return create_trip_day(db, trip_id=trip_id, payload=payload, user=1)
 
 @router.get("/api/trips/{trip_id}/trip_days", response_model=List[TripDayRead], status_code=201)
-def list_trip_days_under_trip(trip_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+def list_trip_days_under_trip(
+    trip_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+    ):
+    trip = db.query(Trip).filter(Trip.id == trip_id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    if (not current_user.admin) and (trip.user_id != current_user.id):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     trip_days = (
         db.query(TripDay)
         .filter(TripDay.trip_id == trip_id)

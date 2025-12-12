@@ -13,7 +13,12 @@ class TripBase(BaseModel):
     public: Optional[bool] = True
 
 class TripCreate(TripBase):
-    user_id: int
+    title:str
+    description: Optional[str] = None
+    city: str
+    country: str
+    photo: Optional[str] = None
+    public: Optional[bool] = False
 
 class TripRead(TripBase):
     id: int

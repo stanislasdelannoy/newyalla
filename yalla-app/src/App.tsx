@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import TripsList from "./pages/TripsList";
 import TripDetail from "./pages/TripDetail";
+import { RequireAuth } from "./requireAuth";
 
 function App() {
   return (
@@ -9,14 +10,15 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Page liste des trips */}
-        <Route path="/trips" element={<TripsList />} />
+        {/* Routes protégées */}
+        <Route element={<RequireAuth />}>
+          <Route path="/trips" element={<TripsList />} />
+          <Route path="/trips/:id" element={<TripDetail />} />
+        </Route>
 
-        {/* Page détail d’un trip */}
-        <Route path="/trips/:id" element={<TripDetail />} />
-
-        {/* route par défaut → login (ou trips si tu préfères) */}
-        <Route path="*" element={<LoginPage />} />
+        {/* Redirs par défaut */}
+        <Route path="/" element={<Navigate to="/trips" replace />} />
+        <Route path="*" element={<Navigate to="/trips" replace />} />
       </Routes>
     </BrowserRouter>
   );
